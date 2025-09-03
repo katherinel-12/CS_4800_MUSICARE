@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "*.{html,js,css}",
+      "src": "**/*.{js,css,html}",
       "use": "@vercel/static"
     }
   ],
@@ -11,5 +11,9 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "buildCommand": null,
+  "outputDirectory": null,
+  "cleanUrls": true,
+  "trailingSlash": false
 }
