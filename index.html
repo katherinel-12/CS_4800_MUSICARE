@@ -3,27 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Vercel App</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Musicare - Music for Health</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Welcome to Musicare</h1>
-            <p>This is a basic template that will hold our company info</p>
+            <p>Music curated for your mood and well-being</p>
         </header>
-        <main>
-            <section class="card">
-                <h2>Musicare info description below:</h2>
-                <p>App that will allow users to find a music curated to their mood for health.</p>
-                <button id="clickMe">Click Me!</button>
-                <p id="message"></p>
-            </section>
-        </main>
+        
+        <div class="tabs">
+            <div class="tab-header">
+                <div class="tab-btn active" data-tab="about">About Us</div>
+                <div class="tab-btn" data-tab="staff">Our Team</div>
+                <div class="tab-btn" data-tab="docs">Documentation</div>
+                <div class="tab-btn" data-tab="sprints">Sprint Logs</div>
+                <div class="tab-btn" data-tab="dailies">Daily Standups</div>
+                <div class="tab-btn" data-tab="report">Project Report</div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="tab-pane active" id="about">
+                    <!-- Empty for now -->
+                </div>
+                
+                <div class="tab-pane" id="staff">
+                    <!-- Empty for now -->
+                </div>
+                
+                <div class="tab-pane" id="docs">
+                    <!-- Empty for now -->
+                </div>
+                
+                <div class="tab-pane" id="sprints">
+                    <!-- Empty for now -->
+                </div>
+                
+                <div class="tab-pane" id="dailies">
+                    <!-- Empty for now -->
+                </div>
+                
+                <div class="tab-pane" id="report">
+                    <!-- Empty for now -->
+                </div>
+            </div>
+        </div>
+        
         <footer>
-            <p>&copy; 2025 Musicare</p>
+            <p>&copy; 2025 Musicare. All rights reserved.</p>
         </footer>
     </div>
-    <script src="/script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
