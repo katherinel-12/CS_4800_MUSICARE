@@ -11,6 +11,17 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    // Test endpoint first
+    if (req.query.test === 'true') {
+      return res.status(200).json({ message: 'API is working', timestamp: new Date().toISOString() });
+    }
+
+    // Test database connection first
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL not found');
+      return res.status(500).json({ error: 'Database configuration missing' });
+    }
+    
     if (req.method === 'GET') {
       // Get all files or files for a specific section
       const { section } = req.query;
@@ -67,7 +78,14 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
 
   } catch (error) {
-    console.error('Database error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('API Error:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error message:', error.message);
+    
+    // Always return JSON, never let it bubble up as HTML
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 }
