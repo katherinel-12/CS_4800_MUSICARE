@@ -138,9 +138,9 @@ function handleFileUpload(files, section) {
             // Save to localStorage
             saveFileToStorage(fileData);
             
-            // Create and display file item
+            // Create and display file item at the top
             const fileItem = createFileItemFromData(fileData);
-            filesContainer.appendChild(fileItem);
+            filesContainer.insertBefore(fileItem, filesContainer.firstChild);
         };
         reader.readAsDataURL(file);
     });
@@ -206,6 +206,13 @@ function saveFileToStorage(fileData) {
 function loadSavedFiles() {
     try {
         const savedFiles = JSON.parse(localStorage.getItem('musicare_files') || '[]');
+        // Sort files by timestamp (newest first) - extract timestamp from ID
+        savedFiles.sort((a, b) => {
+            const timestampA = parseInt(a.id.split('_')[1]);
+            const timestampB = parseInt(b.id.split('_')[1]);
+            return timestampB - timestampA; // Newest first
+        });
+        
         savedFiles.forEach(fileData => {
             const filesContainer = document.getElementById(`${fileData.section}-files`);
             if (filesContainer) {
