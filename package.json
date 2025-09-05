@@ -7,11 +7,18 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "vercel-build": "vite build"
+    "vercel-build": "vite build",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push"
   },
   "keywords": ["music", "health", "wellbeing"],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.6.0",
+    "@prisma/extension-accelerate": "^1.0.0",
+    "prisma": "^5.6.0"
+  },
   "devDependencies": {
     "vite": "^4.4.9"
   }

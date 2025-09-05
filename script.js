@@ -191,29 +191,18 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// LocalStorage management functions
-function saveFileToStorage(fileData) {
+// Database management functions
+async function loadSavedFiles() {
     try {
-        let savedFiles = JSON.parse(localStorage.getItem('musicare_files') || '[]');
-        savedFiles.push(fileData);
-        localStorage.setItem('musicare_files', JSON.stringify(savedFiles));
-    } catch (error) {
-        alert('Error saving file. Storage may be full.');
-        console.error('Storage error:', error);
-    }
-}
-
-function loadSavedFiles() {
-    try {
-        const savedFiles = JSON.parse(localStorage.getItem('musicare_files') || '[]');
-        // Sort files by timestamp (newest first) - extract timestamp from ID
-        savedFiles.sort((a, b) => {
-            const timestampA = parseInt(a.id.split('_')[1]);
-            const timestampB = parseInt(b.id.split('_')[1]);
-            return timestampB - timestampA; // Newest first
-        });
+        const response = await fetch('/api/files');
+        if (!response.ok) {
+            throw new Error('Failed to fetch files');
+        }
         
-        savedFiles.forEach(fileData => {
+        const { files } = await response.json();
+        
+        // Group files by section and display them
+        files.forEach(fileData => {
             const filesContainer = document.getElementById(`${fileData.section}-files`);
             if (filesContainer) {
                 const fileItem = createFileItemFromData(fileData);
@@ -225,61 +214,82 @@ function loadSavedFiles() {
     }
 }
 
-function removeFileFromStorage(fileId) {
+async function removeFileFromDatabase(fileId) {
     try {
-        let savedFiles = JSON.parse(localStorage.getItem('musicare_files') || '[]');
-        savedFiles = savedFiles.filter(file => file.id !== fileId);
-        localStorage.setItem('musicare_files', JSON.stringify(savedFiles));
+        const response = await fetch(`/api/files?id=${fileId}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to delete file');
+        }
+
+        return await response.json();
     } catch (error) {
-        console.error('Error removing file from storage:', error);
+        console.error('Error removing file from database:', error);
+        throw error;
     }
 }
 
-function getFileFromStorage(fileId) {
+async function getFileFromDatabase(fileId) {
     try {
-        const savedFiles = JSON.parse(localStorage.getItem('musicare_files') || '[]');
-        return savedFiles.find(file => file.id === fileId);
+        const response = await fetch('/api/files');
+        if (!response.ok) {
+            throw new Error('Failed to fetch files');
+        }
+        
+        const { files } = await response.json();
+        return files.find(file => file.id === parseInt(fileId));
     } catch (error) {
-        console.error('Error retrieving file from storage:', error);
+        console.error('Error retrieving file from database:', error);
         return null;
     }
 }
 
 // Download file function
-function downloadFile(fileId) {
-    const fileData = getFileFromStorage(fileId);
-    if (!fileData) {
-        alert('File not found.');
-        return;
+async function downloadFile(fileId) {
+    try {
+        const fileData = await getFileFromDatabase(fileId);
+        if (!fileData) {
+            alert('File not found.');
+            return;
+        }
+        
+        // Convert base64 back to blob
+        const byteCharacters = atob(fileData.content.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: fileData.type });
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileData.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        alert(`Error downloading file: ${error.message}`);
     }
-    
-    // Convert base64 back to blob
-    const byteCharacters = atob(fileData.content.split(',')[1]);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: fileData.type });
-    
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileData.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
 }
 
-// Remove file from list and storage
-function removeFile(button) {
+// Remove file from list and database
+async function removeFile(button) {
     const fileItem = button.closest('.file-item');
     const fileId = fileItem.getAttribute('data-file-id');
     
-    // Remove from storage
-    removeFileFromStorage(fileId);
-    
-    // Remove from DOM
-    fileItem.remove();
+    try {
+        // Remove from database
+        await removeFileFromDatabase(fileId);
+        
+        // Remove from DOM
+        fileItem.remove();
+    } catch (error) {
+        alert(`Error removing file: ${error.message}`);
+    }
 }

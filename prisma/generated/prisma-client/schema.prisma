@@ -1,0 +1,24 @@
+// Define database connection via the `DATABASE_URL` env var
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Define custom output path for generated Prisma Client
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma-client"
+}
+
+// File storage model for Musicare
+model File {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  size      Int
+  content   String   @db.Text
+  section   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("musicare_files")
+}
