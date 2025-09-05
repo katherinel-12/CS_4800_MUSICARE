@@ -1,3 +1,6 @@
+// Import database functions
+import { uploadFileToDatabase } from './lib/database.js';
+
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Tab functionality
@@ -117,30 +120,33 @@ function handleFileUpload(files, section) {
             return;
         }
 
-        // Check file size (5MB limit for localStorage)
+        // Check file size (5MB limit for database)
         if (file.size > 5 * 1024 * 1024) {
             alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
             return;
         }
 
-        // Convert file to base64 and save to localStorage
+        // Convert file to base64 and save to database
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             const fileData = {
                 name: file.name,
                 type: file.type,
                 size: file.size,
                 content: e.target.result,
-                section: section,
-                id: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                section: section
             };
             
-            // Save to localStorage
-            saveFileToStorage(fileData);
-            
-            // Create and display file item at the top
-            const fileItem = createFileItemFromData(fileData);
-            filesContainer.insertBefore(fileItem, filesContainer.firstChild);
+            try {
+                // Save to database
+                const response = await uploadFileToDatabase(fileData);
+                
+                // Create and display file item at the top
+                const fileItem = createFileItemFromData(response.file);
+                filesContainer.insertBefore(fileItem, filesContainer.firstChild);
+            } catch (error) {
+                alert(`Error uploading file: ${error.message}`);
+            }
         };
         reader.readAsDataURL(file);
     });
