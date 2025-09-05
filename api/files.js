@@ -1,7 +1,5 @@
-// Temporarily disable Prisma to isolate the issue
-// const { prisma } = require('../lib/prisma.js');
-
-module.exports = async function handler(req, res) {
+// Use ES6 export format for Vercel compatibility
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
