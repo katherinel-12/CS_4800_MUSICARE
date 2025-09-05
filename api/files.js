@@ -1,4 +1,5 @@
-const { prisma } = require('../lib/prisma.js');
+// Temporarily disable Prisma to isolate the issue
+// const { prisma } = require('../lib/prisma.js');
 
 module.exports = async function handler(req, res) {
   // Enable CORS
@@ -13,29 +14,24 @@ module.exports = async function handler(req, res) {
   try {
     // Test endpoint first
     if (req.query.test === 'true') {
-      return res.status(200).json({ message: 'API is working', timestamp: new Date().toISOString() });
-    }
-
-    // Test database connection first
-    if (!process.env.DATABASE_URL) {
-      console.error('DATABASE_URL not found');
-      return res.status(500).json({ error: 'Database configuration missing' });
+      return res.status(200).json({ 
+        message: 'API is working', 
+        timestamp: new Date().toISOString(),
+        hasDatabase: !!process.env.DATABASE_URL,
+        nodeVersion: process.version
+      });
     }
     
     if (req.method === 'GET') {
-      // Get all files or files for a specific section
-      const { section } = req.query;
-      
-      const files = await prisma.file.findMany({
-        where: section ? { section } : {},
-        orderBy: { createdAt: 'desc' }
+      // Return mock data temporarily
+      return res.status(200).json({ 
+        files: [],
+        message: 'Database temporarily disabled for debugging'
       });
-      
-      return res.status(200).json({ files });
     }
 
     if (req.method === 'POST') {
-      // Upload a new file
+      // Mock file upload response
       const { name, type, size, content, section } = req.body;
       
       if (!name || !type || !content || !section) {
@@ -47,32 +43,23 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
       }
 
-      const file = await prisma.file.create({
-        data: {
+      return res.status(201).json({ 
+        file: {
+          id: Date.now(),
           name,
           type,
           size,
-          content,
-          section
-        }
+          section,
+          createdAt: new Date().toISOString()
+        },
+        message: 'Mock upload successful - database temporarily disabled'
       });
-
-      return res.status(201).json({ file });
     }
 
     if (req.method === 'DELETE') {
-      // Delete a file
-      const { id } = req.query;
-      
-      if (!id) {
-        return res.status(400).json({ error: 'File ID is required' });
-      }
-
-      await prisma.file.delete({
-        where: { id: parseInt(id) }
+      return res.status(200).json({ 
+        message: 'Mock delete successful - database temporarily disabled' 
       });
-      
-      return res.status(200).json({ message: 'File deleted successfully' });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
