@@ -1,4 +1,6 @@
-// Use ES6 export format for Vercel compatibility
+// Re-enable Prisma now that ES6 exports are working
+import { prisma } from '../lib/prisma.js';
+
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,15 +23,19 @@ export default async function handler(req, res) {
     }
     
     if (req.method === 'GET') {
-      // Return mock data temporarily
-      return res.status(200).json({ 
-        files: [],
-        message: 'Database temporarily disabled for debugging'
+      // Get all files or files for a specific section
+      const { section } = req.query;
+      
+      const files = await prisma.file.findMany({
+        where: section ? { section } : {},
+        orderBy: { createdAt: 'desc' }
       });
+      
+      return res.status(200).json({ files });
     }
 
     if (req.method === 'POST') {
-      // Mock file upload response
+      // Upload a new file
       const { name, type, size, content, section } = req.body;
       
       if (!name || !type || !content || !section) {
@@ -41,23 +47,32 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
       }
 
-      return res.status(201).json({ 
-        file: {
-          id: Date.now(),
+      const file = await prisma.file.create({
+        data: {
           name,
           type,
           size,
-          section,
-          createdAt: new Date().toISOString()
-        },
-        message: 'Mock upload successful - database temporarily disabled'
+          content,
+          section
+        }
       });
+
+      return res.status(201).json({ file });
     }
 
     if (req.method === 'DELETE') {
-      return res.status(200).json({ 
-        message: 'Mock delete successful - database temporarily disabled' 
+      // Delete a file
+      const { id } = req.query;
+      
+      if (!id) {
+        return res.status(400).json({ error: 'File ID is required' });
+      }
+
+      await prisma.file.delete({
+        where: { id: parseInt(id) }
       });
+      
+      return res.status(200).json({ message: 'File deleted successfully' });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
