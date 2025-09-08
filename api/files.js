@@ -7,19 +7,45 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
+  // Ensure we always return JSON
+  res.setHeader('Content-Type', 'application/json');
+
   try {
-    // Test endpoint first
-    if (req.query.test === 'true') {
-      return res.status(200).json({ 
-        message: 'API is working', 
-        timestamp: new Date().toISOString(),
-        hasDatabase: !!process.env.DATABASE_URL,
-        nodeVersion: process.version
+    // Test database connection first
+    if (!process.env.DATABASE_URL) {
+      return res.status(500).json({ 
+        error: 'Database not configured',
+        details: 'DATABASE_URL environment variable is missing'
       });
+    }
+
+    // Test endpoint
+    if (req.query.test === 'true') {
+      try {
+        // Test database connection
+        await prisma.$connect();
+        return res.status(200).json({ 
+          message: 'API is working', 
+          timestamp: new Date().toISOString(),
+          hasDatabase: !!process.env.DATABASE_URL,
+          nodeVersion: process.version,
+          databaseConnected: true
+        });
+      } catch (dbError) {
+        return res.status(500).json({ 
+          message: 'API is working but database connection failed',
+          timestamp: new Date().toISOString(),
+          hasDatabase: !!process.env.DATABASE_URL,
+          nodeVersion: process.version,
+          databaseConnected: false,
+          dbError: dbError.message
+        });
+      }
     }
     
     if (req.method === 'GET') {
