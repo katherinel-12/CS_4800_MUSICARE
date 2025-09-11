@@ -14,6 +14,7 @@
     --text-light: #7f8c8d;
     --border-color: #e1e4e8;
     --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --sidebar-width: 200px;
 }
 
 body {
@@ -23,121 +24,202 @@ body {
     background-color: var(--background);
     padding: 0;
     margin: 0;
+    height: 100vh;
+    overflow: hidden;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: linear-gradient(180deg, var(--primary-color), #357abd);
+    color: white;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
-header {
+.sidebar-header {
+    padding: 20px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
-    margin-bottom: 30px;
-    padding: 30px 0;
-    background: linear-gradient(135deg, var(--primary-color), #6a11cb);
-    color: white;
-    border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: var(--shadow);
 }
 
-header h1 {
-    font-size: 2.8rem;
+.sidebar-header h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
     margin-bottom: 10px;
-    color: white;
-    font-weight: 700;
 }
 
-header p {
-    font-size: 1.2rem;
-    opacity: 0.9;
-    max-width: 700px;
-    margin: 0 auto;
+.sidebar .github-link {
+    margin-top: 10px;
 }
 
-.github-link {
-    margin-top: 20px;
-}
-
-.github-link a {
+.sidebar .github-link a {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
     color: white;
     text-decoration: none;
     background: rgba(255, 255, 255, 0.1);
-    padding: 10px 20px;
-    border-radius: 25px;
+    padding: 8px;
+    border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
-    font-weight: 500;
+    width: 32px;
+    height: 32px;
 }
 
-.github-link a:hover {
+.sidebar .github-link a:hover {
     background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
 }
 
-/* Tabs Styling */
-.tabs {
-    background: white;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    margin-bottom: 40px;
+.sidebar-nav {
+    padding: 20px 0;
 }
 
-.tab-header {
+.nav-item {
     display: flex;
-    background: #f8f9fa;
-    border-bottom: 1px solid var(--border-color);
-    flex-wrap: wrap;
-}
-
-.tab-btn {
-    padding: 15px 25px;
+    align-items: center;
+    padding: 12px 20px;
     cursor: pointer;
-    font-weight: 500;
-    color: var(--text-light);
     transition: all 0.3s ease;
-    border-bottom: 3px solid transparent;
-    position: relative;
-    font-size: 0.95rem;
+    border-left: 3px solid transparent;
 }
 
-.tab-btn:hover {
-    color: var(--primary-color);
-    background: rgba(74, 144, 226, 0.05);
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-left-color: rgba(255, 255, 255, 0.5);
 }
 
-.tab-btn.active {
-    color: var(--primary-color);
-    border-bottom: 3px solid var(--primary-color);
-    font-weight: 600;
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-left-color: white;
 }
 
-.tab-content {
-    padding: 30px;
+.nav-icon {
+    font-size: 1.2rem;
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
 }
 
-.tab-pane {
+.nav-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Main Content Area */
+.main-content {
+    margin-left: var(--sidebar-width);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.welcome-message {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+}
+
+.welcome-message h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    font-weight: 300;
+    letter-spacing: -1px;
+}
+
+.welcome-message p {
+    font-size: 1.3rem;
+    color: var(--text-light);
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--text-light);
+    opacity: 0.8;
+    font-style: italic;
+}
+
+/* Popup Modal Styles */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+}
+
+.popup-overlay.active {
+    display: flex;
     animation: fadeIn 0.3s ease;
 }
 
-.tab-pane.active {
-    display: block;
+.popup-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
 }
 
-/* Footer */
-footer {
-    text-align: center;
-    margin-top: 40px;
-    padding: 20px 0;
-    color: var(--text-light);
-    font-size: 0.9rem;
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: linear-gradient(135deg, var(--primary-color), #357abd);
+    color: white;
+}
+
+.popup-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.popup-body {
+    padding: 30px;
+    max-height: 60vh;
+    overflow-y: auto;
 }
 
 /* Section Content Styling */
@@ -148,11 +230,47 @@ footer {
     font-weight: 600;
 }
 
+.section-content h3 {
+    color: var(--text-color);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.section-content h4 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
 .section-content p {
     color: var(--text-light);
-    margin-bottom: 30px;
-    font-size: 1.1rem;
+    margin-bottom: 20px;
+    font-size: 1rem;
     line-height: 1.6;
+}
+
+.section-content ul {
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.section-content li {
+    color: var(--text-light);
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.feature-list, .team-grid {
+    margin-top: 20px;
+}
+
+.team-member {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
 }
 
 /* File Upload Styling */
@@ -308,38 +426,73 @@ footer {
     background: #c0392b;
 }
 
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
-    .container {
-        padding: 10px;
+    :root {
+        --sidebar-width: 60px;
     }
     
-    header {
-        padding: 20px 10px;
-        margin: 10px;
-        border-radius: 6px;
+    .sidebar {
+        width: var(--sidebar-width);
     }
     
-    header h1 {
-        font-size: 2rem;
+    .sidebar-header h3 {
+        display: none;
     }
     
-    .tab-header {
-        flex-direction: column;
+    .nav-text {
+        display: none;
     }
     
-    .tab-btn {
-        padding: 12px 20px;
-        border-bottom: 1px solid var(--border-color);
+    .nav-item {
+        justify-content: center;
+        padding: 15px 10px;
     }
     
-    .tab-content {
-        padding: 20px 15px;
+    .nav-icon {
+        margin-right: 0;
+    }
+    
+    .main-content {
+        margin-left: var(--sidebar-width);
+    }
+    
+    .welcome-message h1 {
+        font-size: 2.5rem;
+    }
+    
+    .welcome-message p {
+        font-size: 1.1rem;
+    }
+    
+    .popup-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .popup-header {
+        padding: 15px 20px;
+    }
+    
+    .popup-body {
+        padding: 20px;
     }
 }

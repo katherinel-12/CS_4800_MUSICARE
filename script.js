@@ -3,49 +3,9 @@ import { uploadFileToDatabase } from './lib/database.js';
 
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Tab functionality
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-
-    // Function to switch tabs
-    function switchTab(tabId) {
-        // Hide all tab panes
-        tabPanes.forEach(pane => {
-            pane.classList.remove('active');
-        });
-        
-        // Remove active class from all tab buttons
-        tabBtns.forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Show the selected tab pane
-        const selectedPane = document.getElementById(tabId);
-        if (selectedPane) {
-            selectedPane.classList.add('active');
-        }
-        
-        // Add active class to the clicked tab button
-        const selectedBtn = document.querySelector(`[data-tab="${tabId}"]`);
-        if (selectedBtn) {
-            selectedBtn.classList.add('active');
-        }
-    }
-
-    // Add click event listeners to tab buttons
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabId = btn.getAttribute('data-tab');
-            switchTab(tabId);
-        });
-    });
-
-    // Initialize first tab as active
-    if (tabBtns.length > 0) {
-        const firstTabId = tabBtns[0].getAttribute('data-tab');
-        switchTab(firstTabId);
-    }
-
+    // Initialize popup functionality
+    initializePopupSystem();
+    
     // File upload functionality
     initializeFileUploads();
     
@@ -53,30 +13,112 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSavedFiles();
 });
 
+// Popup system for sidebar navigation
+function initializePopupSystem() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const popupOverlay = document.getElementById('popup-overlay');
+    const popupTitle = document.getElementById('popup-title');
+    const popupBody = document.getElementById('popup-body');
+    const closeBtn = document.getElementById('close-popup');
+    
+    // Section titles mapping
+    const sectionTitles = {
+        'about': 'About Us',
+        'staff': 'Our Team', 
+        'docs': 'Documentation',
+        'sprints': 'Sprint Logs',
+        'dailies': 'Daily Standups',
+        'report': 'Project Report'
+    };
+    
+    // Add click event listeners to navigation items
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const tabId = item.getAttribute('data-tab');
+            openPopup(tabId, sectionTitles[tabId]);
+            
+            // Update active state
+            navItems.forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+    
+    // Close popup functionality
+    closeBtn.addEventListener('click', closePopup);
+    popupOverlay.addEventListener('click', (e) => {
+        if (e.target === popupOverlay) {
+            closePopup();
+        }
+    });
+    
+    // Close popup with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && popupOverlay.classList.contains('active')) {
+            closePopup();
+        }
+    });
+    
+    function openPopup(contentId, title) {
+        const contentTemplate = document.getElementById(`${contentId}-content`);
+        if (contentTemplate) {
+            popupTitle.textContent = title;
+            popupBody.innerHTML = contentTemplate.innerHTML;
+            popupOverlay.classList.add('active');
+            
+            // Re-initialize file upload functionality for the popup content
+            initializePopupFileUploads();
+        }
+    }
+    
+    function closePopup() {
+        popupOverlay.classList.remove('active');
+        // Remove active state from nav items
+        navItems.forEach(nav => nav.classList.remove('active'));
+    }
+}
+
 // File upload management
 function initializeFileUploads() {
-    const uploadAreas = document.querySelectorAll('.file-upload-area');
-    const fileInputs = document.querySelectorAll('input[type="file"]');
+    setupFileUploadHandlers(document);
+}
+
+// Initialize file uploads specifically for popup content
+function initializePopupFileUploads() {
+    const popupBody = document.getElementById('popup-body');
+    setupFileUploadHandlers(popupBody);
+}
+
+// Setup file upload handlers for a given container
+function setupFileUploadHandlers(container) {
+    const uploadAreas = container.querySelectorAll('.file-upload-area');
+    const fileInputs = container.querySelectorAll('input[type="file"]');
 
     // Initialize drag and drop for each upload area
     uploadAreas.forEach(area => {
         const section = area.getAttribute('data-section');
-        const fileInput = document.getElementById(`${section}-file`);
+        const fileInput = container.querySelector(`#${section}-file`);
+        
+        if (!fileInput) return;
+
+        // Remove existing event listeners to prevent duplicates
+        area.replaceWith(area.cloneNode(true));
+        const newArea = container.querySelector(`[data-section="${section}"]`);
+        const newFileInput = container.querySelector(`#${section}-file`);
 
         // Drag and drop events
-        area.addEventListener('dragover', (e) => {
+        newArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            area.classList.add('dragover');
+            newArea.classList.add('dragover');
         });
 
-        area.addEventListener('dragleave', (e) => {
+        newArea.addEventListener('dragleave', (e) => {
             e.preventDefault();
-            area.classList.remove('dragover');
+            newArea.classList.remove('dragover');
         });
 
-        area.addEventListener('drop', (e) => {
+        newArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            area.classList.remove('dragover');
+            newArea.classList.remove('dragover');
             
             const files = Array.from(e.dataTransfer.files);
             const validFiles = files.filter(file => 
@@ -91,16 +133,13 @@ function initializeFileUploads() {
         });
 
         // Click to upload
-        area.addEventListener('click', () => {
-            fileInput.click();
+        newArea.addEventListener('click', () => {
+            newFileInput.click();
         });
-    });
-
-    // File input change events
-    fileInputs.forEach(input => {
-        input.addEventListener('change', (e) => {
+        
+        // File input change event
+        newFileInput.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
-            const section = e.target.id.replace('-file', '');
             
             if (files.length > 0) {
                 handleFileUpload(files, section);
@@ -111,7 +150,20 @@ function initializeFileUploads() {
 
 // Handle file upload and display
 function handleFileUpload(files, section) {
-    const filesContainer = document.getElementById(`${section}-files`);
+    // Try to find the files container in both the main document and popup
+    let filesContainer = document.getElementById(`${section}-files`);
+    if (!filesContainer) {
+        // Look in the popup body
+        const popupBody = document.getElementById('popup-body');
+        if (popupBody) {
+            filesContainer = popupBody.querySelector(`#${section}-files`);
+        }
+    }
+    
+    if (!filesContainer) {
+        console.error(`Files container not found for section: ${section}`);
+        return;
+    }
     
     files.forEach(file => {
         // Check file type
@@ -144,6 +196,13 @@ function handleFileUpload(files, section) {
                 // Create and display file item at the top
                 const fileItem = createFileItemFromData(response.file);
                 filesContainer.insertBefore(fileItem, filesContainer.firstChild);
+                
+                // Also update the corresponding container in the main document if we're in a popup
+                const mainContainer = document.getElementById(`${section}-files`);
+                if (mainContainer && mainContainer !== filesContainer) {
+                    const mainFileItem = createFileItemFromData(response.file);
+                    mainContainer.insertBefore(mainFileItem, mainContainer.firstChild);
+                }
             } catch (error) {
                 alert(`Error uploading file: ${error.message}`);
             }
@@ -207,12 +266,12 @@ async function loadSavedFiles() {
         
         const { files } = await response.json();
         
-        // Group files by section and display them
+        // Group files by section and display them in hidden templates
         files.forEach(fileData => {
-            const filesContainer = document.getElementById(`${fileData.section}-files`);
-            if (filesContainer) {
+            const templateContainer = document.querySelector(`#${fileData.section}-content .uploaded-files`);
+            if (templateContainer) {
                 const fileItem = createFileItemFromData(fileData);
-                filesContainer.appendChild(fileItem);
+                templateContainer.appendChild(fileItem);
             }
         });
     } catch (error) {

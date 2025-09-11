@@ -7,122 +7,164 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Welcome to Musicare</h1>
-            <p>Music curated for your mood and well-being</p>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Musicare</h3>
             <div class="github-link">
                 <a href="https://github.com/PeterBahariance/CS_4800_MUSICARE" target="_blank" rel="noopener noreferrer">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
-                    View on GitHub
                 </a>
             </div>
-        </header>
+        </div>
         
-        <div class="tabs">
-            <div class="tab-header">
-                <div class="tab-btn active" data-tab="about">About Us</div>
-                <div class="tab-btn" data-tab="staff">Our Team</div>
-                <div class="tab-btn" data-tab="docs">Documentation</div>
-                <div class="tab-btn" data-tab="sprints">Sprint Logs</div>
-                <div class="tab-btn" data-tab="dailies">Daily Standups</div>
-                <div class="tab-btn" data-tab="report">Project Report</div>
+        <nav class="sidebar-nav">
+            <div class="nav-item" data-tab="about">
+                <span class="nav-icon">ℹ️</span>
+                <span class="nav-text">About</span>
             </div>
-            
-            <div class="tab-content">
-                <div class="tab-pane active" id="about">
-                    <div class="section-content">
-                        <h2>About Us</h2>
-                        <p>Learn more about Musicare and our mission to provide music for health and well-being.</p>
-                    </div>
+            <div class="nav-item" data-tab="staff">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">Team</span>
+            </div>
+            <div class="nav-item" data-tab="docs">
+                <span class="nav-icon">📚</span>
+                <span class="nav-text">Docs</span>
+            </div>
+            <div class="nav-item" data-tab="sprints">
+                <span class="nav-icon">🏃‍♂️</span>
+                <span class="nav-text">Sprints</span>
+            </div>
+            <div class="nav-item" data-tab="dailies">
+                <span class="nav-icon">📅</span>
+                <span class="nav-text">Standups</span>
+            </div>
+            <div class="nav-item" data-tab="report">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Reports</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="welcome-message">
+            <h1>Welcome to Musicare</h1>
+            <p>Music curated for your mood and well-being</p>
+            <div class="subtitle">Click on the sidebar items to explore</div>
+        </div>
+    </div>
+
+    <!-- Popup Modal -->
+    <div class="popup-overlay" id="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2 id="popup-title">Section Title</h2>
+                <button class="close-btn" id="close-popup">&times;</button>
+            </div>
+            <div class="popup-body" id="popup-body">
+                <!-- Content will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden content templates -->
+    <div class="content-templates" style="display: none;">
+        <div id="about-content">
+            <div class="section-content">
+                <p>Learn more about Musicare and our mission to provide music for health and well-being.</p>
+                <div class="feature-list">
+                    <h3>Our Mission</h3>
+                    <ul>
+                        <li>Curate music for therapeutic purposes</li>
+                        <li>Support mental health through sound</li>
+                        <li>Create personalized wellness experiences</li>
+                    </ul>
                 </div>
-                
-                <div class="tab-pane" id="staff">
-                    <div class="section-content">
-                        <h2>Our Team</h2>
-                        <p>Meet the talented individuals behind Musicare.</p>
-                    </div>
-                </div>
-                
-                <div class="tab-pane" id="docs">
-                    <div class="section-content">
-                        <h2>Documentation</h2>
-                        <p>Access project documentation, guides, and technical specifications.</p>
-                        
-                        <div class="file-upload-section">
-                            <h3>Upload Documentation</h3>
-                            <div class="file-upload-area" data-section="docs">
-                                <div class="upload-icon">📚</div>
-                                <p>Drop your .txt or .pdf files here or click to browse</p>
-                                <input type="file" id="docs-file" accept=".txt,.pdf" multiple>
-                                <button class="upload-btn" onclick="document.getElementById('docs-file').click()">Choose Files</button>
-                            </div>
-                            <div class="uploaded-files" id="docs-files"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane" id="sprints">
-                    <div class="section-content">
-                        <h2>Sprint Logs</h2>
-                        <p>Track our development progress through sprint planning and retrospectives.</p>
-                        
-                        <div class="file-upload-section">
-                            <h3>Upload Sprint Documents</h3>
-                            <div class="file-upload-area" data-section="sprints">
-                                <div class="upload-icon">🏃‍♂️</div>
-                                <p>Drop your .txt or .pdf files here or click to browse</p>
-                                <input type="file" id="sprints-file" accept=".txt,.pdf" multiple>
-                                <button class="upload-btn" onclick="document.getElementById('sprints-file').click()">Choose Files</button>
-                            </div>
-                            <div class="uploaded-files" id="sprints-files"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane" id="dailies">
-                    <div class="section-content">
-                        <h2>Daily Standups</h2>
-                        <p>Daily team check-ins, blockers, and progress updates.</p>
-                        
-                        <div class="file-upload-section">
-                            <h3>Upload Standup Notes</h3>
-                            <div class="file-upload-area" data-section="dailies">
-                                <div class="upload-icon">📅</div>
-                                <p>Drop your .txt or .pdf files here or click to browse</p>
-                                <input type="file" id="dailies-file" accept=".txt,.pdf" multiple>
-                                <button class="upload-btn" onclick="document.getElementById('dailies-file').click()">Choose Files</button>
-                            </div>
-                            <div class="uploaded-files" id="dailies-files"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane" id="report">
-                    <div class="section-content">
-                        <h2>Project Report</h2>
-                        <p>Comprehensive project reports, analysis, and final deliverables.</p>
-                        
-                        <div class="file-upload-section">
-                            <h3>Upload Project Reports</h3>
-                            <div class="file-upload-area" data-section="report">
-                                <div class="upload-icon">📊</div>
-                                <p>Drop your .txt or .pdf files here or click to browse</p>
-                                <input type="file" id="report-file" accept=".txt,.pdf" multiple>
-                                <button class="upload-btn" onclick="document.getElementById('report-file').click()">Choose Files</button>
-                            </div>
-                            <div class="uploaded-files" id="report-files"></div>
-                        </div>
+            </div>
+        </div>
+        
+        <div id="staff-content">
+            <div class="section-content">
+                <p>Meet the talented individuals behind Musicare.</p>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <h4>Development Team</h4>
+                        <p>Passionate developers creating innovative music therapy solutions</p>
                     </div>
                 </div>
             </div>
         </div>
         
-        <footer>
-            <p>&copy; 2025 Musicare. All rights reserved.</p>
-        </footer>
+        <div id="docs-content">
+            <div class="section-content">
+                <p>Access project documentation, guides, and technical specifications.</p>
+                
+                <div class="file-upload-section">
+                    <h3>Upload Documentation</h3>
+                    <div class="file-upload-area" data-section="docs">
+                        <div class="upload-icon">📚</div>
+                        <p>Drop your .txt or .pdf files here or click to browse</p>
+                        <input type="file" id="docs-file" accept=".txt,.pdf" multiple>
+                        <button class="upload-btn" onclick="document.getElementById('docs-file').click()">Choose Files</button>
+                    </div>
+                    <div class="uploaded-files" id="docs-files"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sprints-content">
+            <div class="section-content">
+                <p>Track our development progress through sprint planning and retrospectives.</p>
+                
+                <div class="file-upload-section">
+                    <h3>Upload Sprint Documents</h3>
+                    <div class="file-upload-area" data-section="sprints">
+                        <div class="upload-icon">🏃‍♂️</div>
+                        <p>Drop your .txt or .pdf files here or click to browse</p>
+                        <input type="file" id="sprints-file" accept=".txt,.pdf" multiple>
+                        <button class="upload-btn" onclick="document.getElementById('sprints-file').click()">Choose Files</button>
+                    </div>
+                    <div class="uploaded-files" id="sprints-files"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="dailies-content">
+            <div class="section-content">
+                <p>Daily team check-ins, blockers, and progress updates.</p>
+                
+                <div class="file-upload-section">
+                    <h3>Upload Standup Notes</h3>
+                    <div class="file-upload-area" data-section="dailies">
+                        <div class="upload-icon">📅</div>
+                        <p>Drop your .txt or .pdf files here or click to browse</p>
+                        <input type="file" id="dailies-file" accept=".txt,.pdf" multiple>
+                        <button class="upload-btn" onclick="document.getElementById('dailies-file').click()">Choose Files</button>
+                    </div>
+                    <div class="uploaded-files" id="dailies-files"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="report-content">
+            <div class="section-content">
+                <p>Comprehensive project reports, analysis, and final deliverables.</p>
+                
+                <div class="file-upload-section">
+                    <h3>Upload Project Reports</h3>
+                    <div class="file-upload-area" data-section="report">
+                        <div class="upload-icon">📊</div>
+                        <p>Drop your .txt or .pdf files here or click to browse</p>
+                        <input type="file" id="report-file" accept=".txt,.pdf" multiple>
+                        <button class="upload-btn" onclick="document.getElementById('report-file').click()">Choose Files</button>
+                    </div>
+                    <div class="uploaded-files" id="report-files"></div>
+                </div>
+            </div>
+        </div>
     </div>
     <script type="module" src="./script.js"></script>
 </body>
