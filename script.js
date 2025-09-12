@@ -281,18 +281,25 @@ async function loadSavedFiles() {
 
 async function removeFileFromDatabase(fileId) {
     try {
+        console.log('Attempting to delete file with ID:', fileId);
         const response = await fetch(`/api/files?id=${fileId}`, {
             method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
         });
 
+        const responseData = await response.json().catch(() => ({}));
+        
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to delete file');
+            console.error('Delete failed:', response.status, responseData);
+            throw new Error(responseData.error || `Failed to delete file: ${response.statusText}`);
         }
 
-        return await response.json();
+        console.log('Delete successful:', responseData);
+        return responseData;
     } catch (error) {
-        console.error('Error removing file from database:', error);
+        console.error('Error in removeFileFromDatabase:', error);
         throw error;
     }
 }
@@ -305,7 +312,8 @@ async function getFileFromDatabase(fileId) {
         }
         
         const { files } = await response.json();
-        return files.find(file => file.id === parseInt(fileId));
+        // Convert both IDs to strings for comparison to ensure type consistency
+        return files.find(file => String(file.id) === String(fileId));
     } catch (error) {
         console.error('Error retrieving file from database:', error);
         return null;
@@ -346,15 +354,36 @@ async function downloadFile(fileId) {
 // Remove file from list and database
 async function removeFile(button) {
     const fileItem = button.closest('.file-item');
+    if (!fileItem) {
+        console.error('Could not find parent file item');
+        return;
+    }
+    
     const fileId = fileItem.getAttribute('data-file-id');
+    if (!fileId) {
+        console.error('No file ID found for removal');
+        console.log('File item attributes:', fileItem.attributes);
+        return;
+    }
+    
+    console.log('Removing file with ID:', fileId);
     
     try {
         // Remove from database
+        console.log('Calling removeFileFromDatabase with ID:', fileId);
         await removeFileFromDatabase(fileId);
         
         // Remove from DOM
+        console.log('Removing file item from DOM');
         fileItem.remove();
+        console.log('File removed successfully');
     } catch (error) {
+        console.error('Error in removeFile:', error);
+        console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+        });
         alert(`Error removing file: ${error.message}`);
     }
 }
