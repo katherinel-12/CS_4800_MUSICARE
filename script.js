@@ -234,16 +234,9 @@ function createFileItemFromData(fileData) {
         </div>
         <div class="file-actions">
             <button class="download-file" data-file-id="${fileData.id}">Download</button>
-            <button class="remove-file">Remove</button>
+            <button class="remove-file" data-file-id="${fileData.id}">Remove</button>
         </div>
     `;
-    
-    // Add event listeners after creating the element
-    const downloadBtn = fileItem.querySelector('.download-file');
-    const removeBtn = fileItem.querySelector('.remove-file');
-    
-    downloadBtn.addEventListener('click', () => downloadFile(fileData.id));
-    removeBtn.addEventListener('click', () => removeFile(removeBtn));
     
     return fileItem;
 }
@@ -422,3 +415,13 @@ async function removeFile(button) {
         alert(`Error removing file: ${error.message}`);
     }
 }
+
+// Add event listeners for download and remove buttons
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('download-file')) {
+        const fileId = e.target.getAttribute('data-file-id');
+        downloadFile(fileId);
+    } else if (e.target.classList.contains('remove-file')) {
+        removeFile(e.target);
+    }
+});
