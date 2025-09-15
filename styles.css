@@ -27,6 +27,11 @@ body {
     min-height: 100vh;
 }
 
+a:visited {
+    color: white;
+    text-decoration: none;
+}
+
 /* Sidebar Styles */
 .sidebar {
     position: fixed;
