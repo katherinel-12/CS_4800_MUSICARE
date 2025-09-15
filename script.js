@@ -67,6 +67,9 @@ function initializePopupSystem() {
             
             // Re-initialize file upload functionality for the popup content
             initializePopupFileUploads();
+            
+            // Reload files for this section
+            reloadFilesForSection(contentId);
         }
     }
     
@@ -266,17 +269,49 @@ async function loadSavedFiles() {
         
         const { files } = await response.json();
         
-        // Group files by section and display them in hidden templates
+        // Group files by section and display them
         files.forEach(fileData => {
+            // Load into template containers (for when popups are opened)
             const templateContainer = document.querySelector(`#${fileData.section}-content .uploaded-files`);
             if (templateContainer) {
-                const fileItem = createFileItemFromData(fileData);
-                templateContainer.appendChild(fileItem);
+                const templateFileItem = createFileItemFromData(fileData);
+                templateContainer.appendChild(templateFileItem);
+            }
+            
+            // Also load into any currently visible popup containers
+            const popupContainer = document.querySelector(`#popup-body .uploaded-files[data-section="${fileData.section}"]`);
+            if (popupContainer) {
+                const popupFileItem = createFileItemFromData(fileData);
+                popupContainer.appendChild(popupFileItem);
             }
         });
     } catch (error) {
         console.error('Error loading saved files:', error);
     }
+}
+
+// Function to reload files when popup is opened
+function reloadFilesForSection(section) {
+    fetch('/api/files')
+        .then(response => response.json())
+        .then(({ files }) => {
+            const sectionFiles = files.filter(file => file.section === section);
+            const popupContainer = document.querySelector(`#popup-body .uploaded-files[data-section="${section}"]`);
+            
+            if (popupContainer) {
+                // Clear existing files in popup
+                popupContainer.innerHTML = '';
+                
+                // Add all files for this section
+                sectionFiles.forEach(fileData => {
+                    const fileItem = createFileItemFromData(fileData);
+                    popupContainer.appendChild(fileItem);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error reloading files for section:', error);
+        });
 }
 
 async function removeFileFromDatabase(fileId) {
