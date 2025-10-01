@@ -45,6 +45,10 @@
                 <span class="nav-icon">📊</span>
                 <span class="nav-text">Reports</span>
             </div>
+            <div class="nav-item" data-tab="database">
+                <span class="nav-icon">🗄️</span>
+                <span class="nav-text">Database Demo</span>
+            </div>
                 <div class="nav-item">
                 <span class="nav-icon">🔔</span>
                 <span class="nav-text"><a href="notif.html" style="text-decoration: none;">Notifications</a></span>
@@ -355,7 +359,7 @@
         <div id="report-content">
             <div class="section-content">
                 <p>Comprehensive project reports, analysis, and final deliverables.</p>
-                
+
                 <div class="file-upload-section">
                     <h3>Upload Project Reports</h3>
                     <div class="file-upload-area" data-section="report">
@@ -365,6 +369,43 @@
                         <button class="upload-btn" onclick="document.getElementById('report-file').click()">Choose Files</button>
                     </div>
                     <div class="uploaded-files" id="report-files"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="database-content">
+            <div class="section-content">
+                <p>Demonstrate basic database connectivity using Prisma and PostgreSQL.</p>
+
+                <div class="database-demo-section">
+                    <h3>People Table Demo</h3>
+                    <p>This demo shows a simple People table with 3 attributes: ID, First Name, and Last Name.</p>
+
+                    <div class="demo-controls">
+                        <button id="populate-db-btn" class="populate-btn">Populate Database</button>
+                        <button id="refresh-data-btn" class="refresh-btn">Refresh Data</button>
+                        <button id="clear-db-btn" class="clear-btn">Clear Database</button>
+                    </div>
+
+                    <div class="database-status" id="db-status">
+                        <p>Click "Populate Database" to add sample data to the People table.</p>
+                    </div>
+
+                    <div class="people-table-container" id="people-table-container" style="display: none;">
+                        <h4>People in Database:</h4>
+                        <table class="people-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                </tr>
+                            </thead>
+                            <tbody id="people-table-body">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
